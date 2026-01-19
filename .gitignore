@@ -35,6 +35,7 @@ venv/
 *~
 
 # Config files with secrets
+.env
 config.json
 credentials.json
 token.json
