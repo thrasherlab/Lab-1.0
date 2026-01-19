@@ -37,7 +37,11 @@ try:
 
     # Create flow and exchange code for credentials
     flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-    flow.redirect_uri = 'http://localhost'
+    # Try to match the redirect_uri from the URL
+    if 'redirect_uri' in redirect_url or 'localhost:8080' in redirect_url:
+        flow.redirect_uri = 'http://localhost:8080'
+    else:
+        flow.redirect_uri = 'http://localhost'
     flow.fetch_token(code=code)
     creds = flow.credentials
 
