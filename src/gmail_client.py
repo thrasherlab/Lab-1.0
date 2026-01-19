@@ -71,7 +71,43 @@ class GmailClient:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.credentials_path, SCOPES
                 )
-                creds = flow.run_local_server(port=0)
+
+                # Manual authorization flow
+                auth_url, _ = flow.authorization_url(prompt='consent')
+
+                print("\n" + "="*60)
+                print("Gmail Authentication Required")
+                print("="*60)
+                print("\n1. Visit this URL in your browser:")
+                print(f"\n{auth_url}\n")
+                print("2. Sign in and authorize the app")
+                print("3. You'll be redirected to a URL starting with 'http://localhost'")
+                print("4. Copy the ENTIRE URL from your browser address bar")
+                print("5. Paste it below:")
+                print("="*60)
+
+                code_url = input("\nPaste the full redirect URL here: ").strip()
+
+                # Extract the code from the URL
+                if '?' in code_url:
+                    # Parse the code from URL parameters
+                    from urllib.parse import urlparse, parse_qs
+                    parsed = urlparse(code_url)
+                    params = parse_qs(parsed.query)
+                    code = params.get('code', [None])[0]
+
+                    if not code:
+                        raise ValueError("Could not extract authorization code from URL")
+
+                    flow.fetch_token(code=code)
+                    creds = flow.credentials
+                else:
+                    # Assume they pasted just the code
+                    flow.fetch_token(code=code_url)
+                    creds = flow.credentials
+
+                print("\n✓ Authentication successful!")
+                print("="*60 + "\n")
 
             # Save credentials
             with open(self.token_path, 'w') as token:
