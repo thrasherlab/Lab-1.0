@@ -89,7 +89,7 @@ class GmailClient:
                 code_url = input("\nPaste the full redirect URL here: ").strip()
 
                 # Extract the code from the URL
-                if '?' in code_url:
+                if code_url.startswith(('http://', 'https://')):
                     # Parse the code from URL parameters
                     from urllib.parse import urlparse, parse_qs
                     parsed = urlparse(code_url)
@@ -97,7 +97,7 @@ class GmailClient:
                     code = params.get('code', [None])[0]
 
                     if not code:
-                        raise ValueError("Could not extract authorization code from URL")
+                        raise ValueError("Could not extract authorization code from URL. Please ensure the URL contains a 'code' parameter.")
 
                     flow.fetch_token(code=code)
                     creds = flow.credentials
